@@ -20,7 +20,7 @@ import shutil
 import platform
 import os
 from uncompyle2 import uncompyle_file
-from ableton import __version__
+__version__ = "0.0.1"
 
 class CouldNotFindAppResourcesDirectory(Exception): pass
 
