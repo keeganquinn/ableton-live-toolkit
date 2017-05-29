@@ -54,7 +54,9 @@ def decompile_midi_remote_scripts(output_dir):
     for root, dirs, files in os.walk(midi_remote_dir):
         path = root.split('/')
         for d in dirs:
-            target_dir = os.path.join(output_dir, d)
+            src_dir = os.path.join(root, d)
+            target_dir = os.path.join(output_dir,
+                                      src_dir.replace(midi_remote_dir + "/", ""))
             if not os.path.isdir(target_dir):
                 os.makedirs(target_dir)
 
