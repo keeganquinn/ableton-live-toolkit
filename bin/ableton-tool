@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+
 """Ableton Tool
 
 Usage:
@@ -11,19 +12,29 @@ Options:
   --version     Show version.
 """
 
-from docopt import docopt
-import argparse
+
 import shutil
 import platform
 import os
+
+from docopt import docopt
 from uncompyle2 import uncompyle_file
+
 __version__ = "0.0.1"
 
-class CouldNotFindAppResourcesDirectory(Exception): pass
 
-class UMad(Exception): pass
+class CouldNotFindAppResourcesDirectory(Exception):
+    """Exception raised when no Live installation can be found."""
+    pass
+
+
+class UMad(Exception):
+    """Having a laugh, are we?"""
+    pass
+
 
 def get_ableton_resources_directory():
+    """Locate and return the path to the installed Live resources directory."""
     possible_dirs = []
 
     if platform.system() == "Darwin":
@@ -31,50 +42,58 @@ def get_ableton_resources_directory():
             "/Applications/Ableton Live 9 Suite.app/Contents/App-Resources/"
         ]
     elif platform.system() == "Linux":
-        print "U MAD? Ableton on linux?!"
+        print "U MAD? Ableton on Linux?!"
         raise UMad
     elif platform.system() == "Windows":
         possible_dirs = [
             # XXX fill me in. I don't have winzoz..
         ]
 
-    for d in possible_dirs:
-        if os.path.isdir(d):
-            return d
+    for path in possible_dirs:
+        if os.path.isdir(path):
+            return path
+
     raise CouldNotFindAppResourcesDirectory
 
 
 def decompile_midi_remote_scripts(output_dir):
+    """Decompile all MIDI Remote Scripts from the installed Live."""
     midi_remote_dir = os.path.join(get_ableton_resources_directory(),
-                                  "MIDI Remote Scripts")
+                                   "MIDI Remote Scripts")
 
     for root, dirs, files in os.walk(midi_remote_dir):
-        path = root.split('/')
-        for d in dirs:
-            src_dir = os.path.join(root, d)
-            target_dir = os.path.join(output_dir,
-                                      src_dir.replace(midi_remote_dir + "/", ""))
-            if not os.path.isdir(target_dir):
-                os.makedirs(target_dir)
+        for dirname in dirs:
+            dir_src = os.path.join(root, dirname)
+            dir_dst = os.path.join(
+                output_dir, dir_src.replace(
+                    midi_remote_dir + os.path.sep, ""))
+            if not os.path.isdir(dir_dst):
+                os.makedirs(dir_dst)
 
-        for f in files:
-            compiled_file_src = os.path.join(root, f)
-            compiled_file_dst = os.path.join(output_dir,
-                                             compiled_file_src.replace(midi_remote_dir + "/",
-                                                                       ""))
-            if f.endswith(".pyc"):
-                compiled_file_dst = compiled_file_dst.replace(".pyc", ".py")
-                print "Decompiling %s into %s" % (compiled_file_src, compiled_file_dst)
-                outstream = open(compiled_file_dst, "w+")
-                uncompyle_file(compiled_file_src, outstream)
+        for filename in files:
+            file_src = os.path.join(root, filename)
+            file_dst = os.path.join(
+                output_dir, file_src.replace(
+                    midi_remote_dir + os.path.sep, ""))
+            if filename.endswith(".pyc"):
+                file_dst = file_dst.replace(".pyc", ".py")
+                print "Decompiling %s into %s" % (file_src, file_dst)
+                outstream = open(file_dst, "w+")
+                uncompyle_file(file_src, outstream)
                 outstream.close()
             else:
-                shutil.copyfile(compiled_file_src, compiled_file_dst)
+                shutil.copyfile(file_src, file_dst)
 
-if __name__ == '__main__':
+
+def main():
+    """Main program function."""
     args = docopt(__doc__, version='Ableton Tool '+__version__)
     if args['decompile-midi-remote-scripts']:
         target_dir = "MIDI Remote Scripts"
         if args['<dst>']:
             target_dir = args['<dst>']
         decompile_midi_remote_scripts(target_dir)
+
+
+if __name__ == '__main__':
+    main()
