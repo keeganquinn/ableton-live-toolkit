@@ -1,3 +1,2 @@
 docopt
 https://github.com/Mysterie/uncompyle2/archive/master.zip
-pafy
