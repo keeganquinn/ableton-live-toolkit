@@ -1,6 +1,4 @@
-#!/usr/bin/env python
-
-"""Ableton Tool
+"""Ableton Live Toolkit
 
 Usage:
   ableton-tool decompile-midi-remote-scripts [<dst>]
@@ -18,7 +16,7 @@ import platform
 import os
 
 from docopt import docopt
-from uncompyle2 import uncompyle_file
+from uncompyle6 import uncompyle_file
 
 __version__ = "0.0.1"
 
@@ -87,13 +85,9 @@ def decompile_midi_remote_scripts(output_dir):
 
 def main():
     """Main program function."""
-    args = docopt(__doc__, version='Ableton Tool '+__version__)
+    args = docopt(__doc__, version='Ableton Live Toolkit ' + __version__)
     if args['decompile-midi-remote-scripts']:
         target_dir = "MIDI Remote Scripts"
         if args['<dst>']:
             target_dir = args['<dst>']
         decompile_midi_remote_scripts(target_dir)
-
-
-if __name__ == '__main__':
-    main()

@@ -1,1 +1,4 @@
 *.pyc
+build
+dist
+live_toolkit.egg-info
